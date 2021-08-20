@@ -111,3 +111,30 @@ func TestMerge(t *testing.T) {
 		t.Fatalf("Expected %v from Merge, received %v", expected, elements)
 	}
 }
+
+func TestDropAll(t *testing.T) {
+	done := make(chan interface{})
+	defer close(done)
+
+	incomingChannel := make(chan interface{})
+	go func() {
+		defer close(incomingChannel)
+		incomingChannel <- 1
+		incomingChannel <- 2
+		incomingChannel <- 3
+		incomingChannel <- 4
+		incomingChannel <- 4
+	}()
+
+	outputChannel := extra.DropAll(done, incomingChannel, 4)
+
+	var elements []interface{}
+	for element := range outputChannel {
+		elements = append(elements, element)
+	}
+
+	expected := []interface{}{1, 2, 3}
+	if !reflect.DeepEqual(elements, expected) {
+		t.Fatalf("Expected %v from DropAll, received %v", expected, elements)
+	}
+}

@@ -48,6 +48,25 @@ func Take(done <-chan interface{}, incoming <-chan interface{}, nElements int) <
 	return outputChannel
 }
 
+func DropAll(done <-chan interface{}, incoming <-chan interface{}, element int) <-chan interface{} {
+
+	outputChannel := make(chan interface{})
+	go func() {
+		defer close(outputChannel)
+		for value := range incoming {
+			select {
+			case <-done:
+				return
+			default:
+				if value != element {
+					outputChannel <- value
+				}
+			}
+		}
+	}()
+	return outputChannel
+}
+
 func Merge(done <-chan interface{}, channels ...<-chan interface{}) <-chan interface{} {
 
 	outputChannel := make(chan interface{})
