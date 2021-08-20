@@ -6,7 +6,9 @@ Contains a set of small functions under concurrent/extra package -
 + Map
   + launches a goroutine to map value from an incoming channel and writes these mapped values to an output channel
 + Filter
-  + launches a goroutine to filter values from an incoming channel and writes these mapped values to an output channel
+  + launches a goroutine to filter values from an incoming channel and writes these filtered values to an output channel
++ Reverse
+  + launches a goroutine to reverse values from an incoming channel and writes these values to an output channel
 + Take
   + launches a goroutine to take N values from an incoming channel and writes these values to an output channel
 + DropAll
