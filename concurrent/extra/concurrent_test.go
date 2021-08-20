@@ -279,3 +279,36 @@ func TestPipelineUsingRepeatMapTake(t *testing.T) {
 		t.Fatalf("Expected %v from PipelineUsingRepeatMapTake, received %v", expected, elements)
 	}
 }
+
+func TestTee(t *testing.T) {
+	done := make(chan interface{})
+	defer close(done)
+
+	inputChannel := make(chan interface{})
+	go func() {
+		defer close(inputChannel)
+		inputChannel <- 1
+		inputChannel <- 2
+		inputChannel <- 3
+		inputChannel <- 4
+	}()
+
+	outputChannel1, outputChannel2 := extra.Tee(done, inputChannel)
+
+	var elementsFromOutputChannel1 []interface{}
+	var elementsFromOutputChannel2 []interface{}
+
+	for count := 1; count <= 4; count++ {
+		elementsFromOutputChannel1 = append(elementsFromOutputChannel1, <-outputChannel1)
+		elementsFromOutputChannel2 = append(elementsFromOutputChannel2, <-outputChannel2)
+	}
+
+	expected := []interface{}{1, 2, 3, 4}
+	if !reflect.DeepEqual(elementsFromOutputChannel1, expected) {
+		t.Fatalf("Expected %v from Tee in OutputChannel1, received %v", expected, elementsFromOutputChannel1)
+	}
+
+	if !reflect.DeepEqual(elementsFromOutputChannel1, expected) {
+		t.Fatalf("Expected %v from Tee in OutputChannel2, received %v", expected, elementsFromOutputChannel2)
+	}
+}

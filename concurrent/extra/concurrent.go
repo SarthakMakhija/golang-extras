@@ -172,3 +172,31 @@ func Merge(done <-chan interface{}, channels ...<-chan interface{}) <-chan inter
 	}()
 	return outputChannel
 }
+
+func Tee(done <-chan interface{}, inputChannel <-chan interface{}) (<-chan interface{}, chan interface{}) {
+
+	outputChannel1 := make(chan interface{})
+	outputChannel2 := make(chan interface{})
+
+	go func() {
+		defer close(outputChannel1)
+		defer close(outputChannel2)
+
+		for value := range inputChannel {
+			select {
+			case <-done:
+				return
+			default:
+				for count := 1; count <= 2; count++ {
+					select {
+					case <-done:
+						return
+					case outputChannel1 <- value:
+					case outputChannel2 <- value:
+					}
+				}
+			}
+		}
+	}()
+	return outputChannel1, outputChannel2
+}
