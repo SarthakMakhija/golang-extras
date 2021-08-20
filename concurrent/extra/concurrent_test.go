@@ -51,3 +51,30 @@ func TestMap(t *testing.T) {
 		t.Fatalf("Expected %v from Map, received %v", expected, elements)
 	}
 }
+
+func TestTake(t *testing.T) {
+	done := make(chan interface{})
+	defer close(done)
+
+	incomingChannel := make(chan interface{})
+	go func() {
+		defer close(incomingChannel)
+		incomingChannel <- 1
+		incomingChannel <- 2
+		incomingChannel <- 3
+		incomingChannel <- 4
+		incomingChannel <- 5
+	}()
+
+	outputChannel := extra.Take(done, incomingChannel, 4)
+
+	var elements []interface{}
+	for element := range outputChannel {
+		elements = append(elements, element)
+	}
+
+	expected := []interface{}{1, 2, 3, 4}
+	if !reflect.DeepEqual(elements, expected) {
+		t.Fatalf("Expected %v from Take, received %v", expected, elements)
+	}
+}

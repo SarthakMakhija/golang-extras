@@ -31,3 +31,19 @@ func Map(done <-chan interface{}, incoming <-chan interface{}, mapFunc func(inte
 	}()
 	return outputChannel
 }
+
+func Take(done <-chan interface{}, incoming <-chan interface{}, nElements int) <-chan interface{} {
+
+	outputChannel := make(chan interface{})
+	go func() {
+		defer close(outputChannel)
+		for count := 1; count <= nElements; count++ {
+			select {
+			case <-done:
+				return
+			case outputChannel <- <-incoming:
+			}
+		}
+	}()
+	return outputChannel
+}
