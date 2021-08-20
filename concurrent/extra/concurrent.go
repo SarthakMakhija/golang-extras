@@ -11,7 +11,7 @@ Need to handle that
 
 func Repeat(
 	done <-chan interface{},
-	fn func() interface{},
+	generatorFunction func() interface{},
 ) <-chan interface{} {
 
 	outputChannel := make(chan interface{})
@@ -21,7 +21,7 @@ func Repeat(
 			select {
 			case <-done:
 				return
-			case outputChannel <- fn():
+			case outputChannel <- generatorFunction():
 			}
 		}
 	}()
@@ -31,7 +31,7 @@ func Repeat(
 func Map(
 	done <-chan interface{},
 	inputChannel <-chan interface{},
-	mapFunc func(interface{}) interface{},
+	mapFunction func(interface{}) interface{},
 ) <-chan interface{} {
 
 	outputChannel := make(chan interface{})
@@ -41,7 +41,7 @@ func Map(
 			select {
 			case <-done:
 				return
-			case outputChannel <- mapFunc(value):
+			case outputChannel <- mapFunction(value):
 			}
 		}
 	}()
@@ -51,7 +51,7 @@ func Map(
 func Filter(
 	done <-chan interface{},
 	inputChannel <-chan interface{},
-	filterFunc func(interface{}) bool,
+	filterFunction func(interface{}) bool,
 ) <-chan interface{} {
 
 	outputChannel := make(chan interface{})
@@ -62,7 +62,7 @@ func Filter(
 			case <-done:
 				return
 			default:
-				if filterFunc(value) {
+				if filterFunction(value) {
 					outputChannel <- value
 				}
 			}
@@ -74,7 +74,7 @@ func Filter(
 func Skip(
 	done <-chan interface{},
 	inputChannel <-chan interface{},
-	skipFunc func(interface{}) bool,
+	skipFunction func(interface{}) bool,
 ) <-chan interface{} {
 
 	outputChannel := make(chan interface{})
@@ -85,7 +85,7 @@ func Skip(
 			case <-done:
 				return
 			default:
-				if !skipFunc(value) {
+				if !skipFunction(value) {
 					outputChannel <- value
 				}
 			}
