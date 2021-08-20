@@ -138,3 +138,30 @@ func TestDropAll(t *testing.T) {
 		t.Fatalf("Expected %v from DropAll, received %v", expected, elements)
 	}
 }
+
+func TestPipelineUsingRepeatMapTake(t *testing.T) {
+	done := make(chan interface{})
+	defer close(done)
+
+	outputChannel := extra.Take(done,
+		extra.Map(done,
+			extra.Repeat(done,
+				func() interface{} {
+					return 2
+				},
+			),
+			func(value interface{}) interface{} {
+				return (value.(int)) * 2
+			},
+		), 4)
+
+	var elements []interface{}
+	for element := range outputChannel {
+		elements = append(elements, element)
+	}
+
+	expected := []interface{}{4, 4, 4, 4}
+	if !reflect.DeepEqual(elements, expected) {
+		t.Fatalf("Expected %v from PipelineUsingRepeatMapTake, received %v", expected, elements)
+	}
+}
