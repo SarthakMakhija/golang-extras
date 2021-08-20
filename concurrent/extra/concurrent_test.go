@@ -162,6 +162,37 @@ func TestTake(t *testing.T) {
 	}
 }
 
+func TestTakeWhile(t *testing.T) {
+	done := make(chan interface{})
+	defer close(done)
+
+	inputChannel := make(chan interface{})
+	go func() {
+		defer close(inputChannel)
+		inputChannel <- 1
+		inputChannel <- 2
+		inputChannel <- 3
+		inputChannel <- 4
+		inputChannel <- 5
+		inputChannel <- 6
+		inputChannel <- 7
+	}()
+
+	outputChannel := extra.TakeWhile(done, inputChannel, func(value interface{}) bool {
+		return (value.(int)) <= 5
+	})
+
+	var elements []interface{}
+	for element := range outputChannel {
+		elements = append(elements, element)
+	}
+
+	expected := []interface{}{1, 2, 3, 4, 5}
+	if !reflect.DeepEqual(elements, expected) {
+		t.Fatalf("Expected %v from TakeWhile, received %v", expected, elements)
+	}
+}
+
 func TestMerge(t *testing.T) {
 	done := make(chan interface{})
 	defer close(done)

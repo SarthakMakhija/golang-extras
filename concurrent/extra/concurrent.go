@@ -86,6 +86,27 @@ func Take(done <-chan interface{}, inputChannel <-chan interface{}, nElements in
 	return outputChannel
 }
 
+func TakeWhile(done <-chan interface{}, inputChannel <-chan interface{}, condition func(interface{}) bool) <-chan interface{} {
+
+	outputChannel := make(chan interface{})
+	go func() {
+		defer close(outputChannel)
+		for value := range inputChannel {
+			select {
+			case <-done:
+				return
+			default:
+				if condition(value) {
+					outputChannel <- value
+				} else {
+					return
+				}
+			}
+		}
+	}()
+	return outputChannel
+}
+
 func DropAll(done <-chan interface{}, inputChannel <-chan interface{}, element int) <-chan interface{} {
 
 	outputChannel := make(chan interface{})
