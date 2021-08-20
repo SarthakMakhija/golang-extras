@@ -51,6 +51,25 @@ func Filter(done <-chan interface{}, inputChannel <-chan interface{}, filterFunc
 	return outputChannel
 }
 
+func Skip(done <-chan interface{}, inputChannel <-chan interface{}, skipFunc func(interface{}) bool) <-chan interface{} {
+
+	outputChannel := make(chan interface{})
+	go func() {
+		defer close(outputChannel)
+		for value := range inputChannel {
+			select {
+			case <-done:
+				return
+			default:
+				if !skipFunc(value) {
+					outputChannel <- value
+				}
+			}
+		}
+	}()
+	return outputChannel
+}
+
 func Take(done <-chan interface{}, inputChannel <-chan interface{}, nElements int) <-chan interface{} {
 
 	outputChannel := make(chan interface{})

@@ -81,6 +81,34 @@ func TestFilter(t *testing.T) {
 	}
 }
 
+func TestSkip(t *testing.T) {
+	done := make(chan interface{})
+	defer close(done)
+
+	inputChannel := make(chan interface{})
+	go func() {
+		defer close(inputChannel)
+		inputChannel <- 1
+		inputChannel <- 2
+		inputChannel <- 3
+		inputChannel <- 4
+	}()
+
+	outputChannel := extra.Skip(done, inputChannel, func(value interface{}) bool {
+		return math.Mod(float64(value.(int)), 2) == 0
+	})
+
+	var elements []interface{}
+	for mapped := range outputChannel {
+		elements = append(elements, mapped)
+	}
+
+	expected := []interface{}{1, 3}
+	if !reflect.DeepEqual(elements, expected) {
+		t.Fatalf("Expected %v from Skip, received %v", expected, elements)
+	}
+}
+
 func TestReverse(t *testing.T) {
 	done := make(chan interface{})
 	defer close(done)
