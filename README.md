@@ -13,6 +13,8 @@ Contains a set of small functions under concurrent/extra package -
   + launches a goroutine to reverse values from an incoming channel and writes these values to an output channel
 + Take
   + launches a goroutine to take N values from an incoming channel and writes these values to an output channel
++ TakeWhile
+  + launches a goroutine to take values from an incoming channel, till the condition is true and writes these values to an output channel
 + DropAll
   + launches a goroutine to drop all values matching an input, from an incoming channel and writes these values to an output channel
 + Merge
