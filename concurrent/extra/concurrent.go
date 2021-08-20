@@ -16,12 +16,12 @@ func Repeat(done <-chan interface{}, fn func() interface{}) <-chan interface{} {
 	return outputChannel
 }
 
-func Map(done <-chan interface{}, incoming <-chan interface{}, mapFunc func(interface{}) interface{}) <-chan interface{} {
+func Map(done <-chan interface{}, inputChannel <-chan interface{}, mapFunc func(interface{}) interface{}) <-chan interface{} {
 
 	outputChannel := make(chan interface{})
 	go func() {
 		defer close(outputChannel)
-		for value := range incoming {
+		for value := range inputChannel {
 			select {
 			case <-done:
 				return
@@ -32,7 +32,7 @@ func Map(done <-chan interface{}, incoming <-chan interface{}, mapFunc func(inte
 	return outputChannel
 }
 
-func Take(done <-chan interface{}, incoming <-chan interface{}, nElements int) <-chan interface{} {
+func Take(done <-chan interface{}, inputChannel <-chan interface{}, nElements int) <-chan interface{} {
 
 	outputChannel := make(chan interface{})
 	go func() {
@@ -41,19 +41,19 @@ func Take(done <-chan interface{}, incoming <-chan interface{}, nElements int) <
 			select {
 			case <-done:
 				return
-			case outputChannel <- <-incoming:
+			case outputChannel <- <-inputChannel:
 			}
 		}
 	}()
 	return outputChannel
 }
 
-func DropAll(done <-chan interface{}, incoming <-chan interface{}, element int) <-chan interface{} {
+func DropAll(done <-chan interface{}, inputChannel <-chan interface{}, element int) <-chan interface{} {
 
 	outputChannel := make(chan interface{})
 	go func() {
 		defer close(outputChannel)
-		for value := range incoming {
+		for value := range inputChannel {
 			select {
 			case <-done:
 				return

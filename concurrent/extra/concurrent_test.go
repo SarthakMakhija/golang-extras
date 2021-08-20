@@ -29,15 +29,15 @@ func TestMap(t *testing.T) {
 	done := make(chan interface{})
 	defer close(done)
 
-	incomingChannel := make(chan interface{})
+	inputChannel := make(chan interface{})
 	go func() {
-		defer close(incomingChannel)
-		incomingChannel <- 1
-		incomingChannel <- 2
-		incomingChannel <- 3
+		defer close(inputChannel)
+		inputChannel <- 1
+		inputChannel <- 2
+		inputChannel <- 3
 	}()
 
-	outputChannel := extra.Map(done, incomingChannel, func(value interface{}) interface{} {
+	outputChannel := extra.Map(done, inputChannel, func(value interface{}) interface{} {
 		return (value.(int)) * 2
 	})
 
@@ -56,17 +56,17 @@ func TestTake(t *testing.T) {
 	done := make(chan interface{})
 	defer close(done)
 
-	incomingChannel := make(chan interface{})
+	inputChannel := make(chan interface{})
 	go func() {
-		defer close(incomingChannel)
-		incomingChannel <- 1
-		incomingChannel <- 2
-		incomingChannel <- 3
-		incomingChannel <- 4
-		incomingChannel <- 5
+		defer close(inputChannel)
+		inputChannel <- 1
+		inputChannel <- 2
+		inputChannel <- 3
+		inputChannel <- 4
+		inputChannel <- 5
 	}()
 
-	outputChannel := extra.Take(done, incomingChannel, 4)
+	outputChannel := extra.Take(done, inputChannel, 4)
 
 	var elements []interface{}
 	for element := range outputChannel {
@@ -83,12 +83,12 @@ func TestMerge(t *testing.T) {
 	done := make(chan interface{})
 	defer close(done)
 
-	incomingChannel := make(chan interface{})
+	inputChannel := make(chan interface{})
 	go func() {
-		defer close(incomingChannel)
-		incomingChannel <- 1
-		incomingChannel <- 2
-		incomingChannel <- 3
+		defer close(inputChannel)
+		inputChannel <- 1
+		inputChannel <- 2
+		inputChannel <- 3
 	}()
 
 	anotherIncomingChannel := make(chan interface{})
@@ -99,7 +99,7 @@ func TestMerge(t *testing.T) {
 		anotherIncomingChannel <- 6
 	}()
 
-	outputChannel := extra.Merge(done, incomingChannel, anotherIncomingChannel)
+	outputChannel := extra.Merge(done, inputChannel, anotherIncomingChannel)
 
 	var elements []interface{}
 	for element := range outputChannel {
@@ -116,17 +116,17 @@ func TestDropAll(t *testing.T) {
 	done := make(chan interface{})
 	defer close(done)
 
-	incomingChannel := make(chan interface{})
+	inputChannel := make(chan interface{})
 	go func() {
-		defer close(incomingChannel)
-		incomingChannel <- 1
-		incomingChannel <- 2
-		incomingChannel <- 3
-		incomingChannel <- 4
-		incomingChannel <- 4
+		defer close(inputChannel)
+		inputChannel <- 1
+		inputChannel <- 2
+		inputChannel <- 3
+		inputChannel <- 4
+		inputChannel <- 4
 	}()
 
-	outputChannel := extra.DropAll(done, incomingChannel, 4)
+	outputChannel := extra.DropAll(done, inputChannel, 4)
 
 	var elements []interface{}
 	for element := range outputChannel {
