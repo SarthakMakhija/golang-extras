@@ -1,6 +1,9 @@
 package extra
 
-func Repeat(done <-chan interface{}, fn func() interface{}) <-chan interface{} {
+func Repeat(
+	done <-chan interface{},
+	fn func() interface{},
+) <-chan interface{} {
 
 	outputChannel := make(chan interface{})
 	go func() {
@@ -16,7 +19,11 @@ func Repeat(done <-chan interface{}, fn func() interface{}) <-chan interface{} {
 	return outputChannel
 }
 
-func Map(done <-chan interface{}, inputChannel <-chan interface{}, mapFunc func(interface{}) interface{}) <-chan interface{} {
+func Map(
+	done <-chan interface{},
+	inputChannel <-chan interface{},
+	mapFunc func(interface{}) interface{},
+) <-chan interface{} {
 
 	outputChannel := make(chan interface{})
 	go func() {
@@ -32,7 +39,11 @@ func Map(done <-chan interface{}, inputChannel <-chan interface{}, mapFunc func(
 	return outputChannel
 }
 
-func Filter(done <-chan interface{}, inputChannel <-chan interface{}, filterFunc func(interface{}) bool) <-chan interface{} {
+func Filter(
+	done <-chan interface{},
+	inputChannel <-chan interface{},
+	filterFunc func(interface{}) bool,
+) <-chan interface{} {
 
 	outputChannel := make(chan interface{})
 	go func() {
@@ -51,7 +62,11 @@ func Filter(done <-chan interface{}, inputChannel <-chan interface{}, filterFunc
 	return outputChannel
 }
 
-func Skip(done <-chan interface{}, inputChannel <-chan interface{}, skipFunc func(interface{}) bool) <-chan interface{} {
+func Skip(
+	done <-chan interface{},
+	inputChannel <-chan interface{},
+	skipFunc func(interface{}) bool,
+) <-chan interface{} {
 
 	outputChannel := make(chan interface{})
 	go func() {
@@ -70,7 +85,11 @@ func Skip(done <-chan interface{}, inputChannel <-chan interface{}, skipFunc fun
 	return outputChannel
 }
 
-func Take(done <-chan interface{}, inputChannel <-chan interface{}, nElements int) <-chan interface{} {
+func Take(
+	done <-chan interface{},
+	inputChannel <-chan interface{},
+	nElements int,
+) <-chan interface{} {
 
 	outputChannel := make(chan interface{})
 	go func() {
@@ -86,7 +105,11 @@ func Take(done <-chan interface{}, inputChannel <-chan interface{}, nElements in
 	return outputChannel
 }
 
-func TakeWhile(done <-chan interface{}, inputChannel <-chan interface{}, condition func(interface{}) bool) <-chan interface{} {
+func TakeWhile(
+	done <-chan interface{},
+	inputChannel <-chan interface{},
+	condition func(interface{}) bool,
+) <-chan interface{} {
 
 	outputChannel := make(chan interface{})
 	go func() {
@@ -107,7 +130,11 @@ func TakeWhile(done <-chan interface{}, inputChannel <-chan interface{}, conditi
 	return outputChannel
 }
 
-func DropAll(done <-chan interface{}, inputChannel <-chan interface{}, element int) <-chan interface{} {
+func DropAll(
+	done <-chan interface{},
+	inputChannel <-chan interface{},
+	element int,
+) <-chan interface{} {
 
 	outputChannel := make(chan interface{})
 	go func() {
@@ -126,7 +153,10 @@ func DropAll(done <-chan interface{}, inputChannel <-chan interface{}, element i
 	return outputChannel
 }
 
-func Reverse(done <-chan interface{}, inputChannel <-chan interface{}) <-chan interface{} {
+func Reverse(
+	done <-chan interface{},
+	inputChannel <-chan interface{},
+) <-chan interface{} {
 
 	outputChannel := make(chan interface{})
 	go func() {
@@ -152,7 +182,10 @@ func Reverse(done <-chan interface{}, inputChannel <-chan interface{}) <-chan in
 	return outputChannel
 }
 
-func Merge(done <-chan interface{}, channels ...<-chan interface{}) <-chan interface{} {
+func Merge(
+	done <-chan interface{},
+	channels ...<-chan interface{},
+) <-chan interface{} {
 
 	outputChannel := make(chan interface{})
 	go func() {
@@ -173,7 +206,10 @@ func Merge(done <-chan interface{}, channels ...<-chan interface{}) <-chan inter
 	return outputChannel
 }
 
-func Tee(done <-chan interface{}, inputChannel <-chan interface{}) (<-chan interface{}, chan interface{}) {
+func Tee(
+	done <-chan interface{},
+	inputChannel <-chan interface{},
+) (<-chan interface{}, chan interface{}) {
 
 	outputChannel1 := make(chan interface{})
 	outputChannel2 := make(chan interface{})
