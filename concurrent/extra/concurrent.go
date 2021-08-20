@@ -47,3 +47,24 @@ func Take(done <-chan interface{}, incoming <-chan interface{}, nElements int) <
 	}()
 	return outputChannel
 }
+
+func Merge(done <-chan interface{}, channels ...<-chan interface{}) <-chan interface{} {
+
+	outputChannel := make(chan interface{})
+	go func() {
+		defer close(outputChannel)
+		publishFrom := func(ch <-chan interface{}) {
+			for value := range ch {
+				select {
+				case <-done:
+					return
+				case outputChannel <- value:
+				}
+			}
+		}
+		for _, channel := range channels {
+			publishFrom(channel)
+		}
+	}()
+	return outputChannel
+}

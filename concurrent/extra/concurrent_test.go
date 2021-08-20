@@ -78,3 +78,36 @@ func TestTake(t *testing.T) {
 		t.Fatalf("Expected %v from Take, received %v", expected, elements)
 	}
 }
+
+func TestMerge(t *testing.T) {
+	done := make(chan interface{})
+	defer close(done)
+
+	incomingChannel := make(chan interface{})
+	go func() {
+		defer close(incomingChannel)
+		incomingChannel <- 1
+		incomingChannel <- 2
+		incomingChannel <- 3
+	}()
+
+	anotherIncomingChannel := make(chan interface{})
+	go func() {
+		defer close(anotherIncomingChannel)
+		anotherIncomingChannel <- 4
+		anotherIncomingChannel <- 5
+		anotherIncomingChannel <- 6
+	}()
+
+	outputChannel := extra.Merge(done, incomingChannel, anotherIncomingChannel)
+
+	var elements []interface{}
+	for element := range outputChannel {
+		elements = append(elements, element)
+	}
+
+	expected := []interface{}{1, 2, 3, 4, 5, 6}
+	if !reflect.DeepEqual(elements, expected) {
+		t.Fatalf("Expected %v from Merge, received %v", expected, elements)
+	}
+}
