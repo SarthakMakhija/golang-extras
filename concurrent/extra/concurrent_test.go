@@ -2,6 +2,7 @@ package extra_test
 
 import (
 	"github.com/SarthakMakhija/golang-extras/concurrent/extra"
+	"math"
 	"reflect"
 	"testing"
 )
@@ -49,6 +50,34 @@ func TestMap(t *testing.T) {
 	expected := []interface{}{2, 4, 6}
 	if !reflect.DeepEqual(elements, expected) {
 		t.Fatalf("Expected %v from Map, received %v", expected, elements)
+	}
+}
+
+func TestFilter(t *testing.T) {
+	done := make(chan interface{})
+	defer close(done)
+
+	inputChannel := make(chan interface{})
+	go func() {
+		defer close(inputChannel)
+		inputChannel <- 1
+		inputChannel <- 2
+		inputChannel <- 3
+		inputChannel <- 4
+	}()
+
+	outputChannel := extra.Filter(done, inputChannel, func(value interface{}) bool {
+		return math.Mod(float64(value.(int)), 2) == 0
+	})
+
+	var elements []interface{}
+	for mapped := range outputChannel {
+		elements = append(elements, mapped)
+	}
+
+	expected := []interface{}{2, 4}
+	if !reflect.DeepEqual(elements, expected) {
+		t.Fatalf("Expected %v from Filter, received %v", expected, elements)
 	}
 }
 

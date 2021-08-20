@@ -32,6 +32,25 @@ func Map(done <-chan interface{}, inputChannel <-chan interface{}, mapFunc func(
 	return outputChannel
 }
 
+func Filter(done <-chan interface{}, inputChannel <-chan interface{}, filterFunc func(interface{}) bool) <-chan interface{} {
+
+	outputChannel := make(chan interface{})
+	go func() {
+		defer close(outputChannel)
+		for value := range inputChannel {
+			select {
+			case <-done:
+				return
+			default:
+				if filterFunc(value) {
+					outputChannel <- value
+				}
+			}
+		}
+	}()
+	return outputChannel
+}
+
 func Take(done <-chan interface{}, inputChannel <-chan interface{}, nElements int) <-chan interface{} {
 
 	outputChannel := make(chan interface{})
