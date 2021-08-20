@@ -86,6 +86,32 @@ func DropAll(done <-chan interface{}, inputChannel <-chan interface{}, element i
 	return outputChannel
 }
 
+func Reverse(done <-chan interface{}, inputChannel <-chan interface{}) <-chan interface{} {
+
+	outputChannel := make(chan interface{})
+	go func() {
+		defer close(outputChannel)
+		var elements []interface{}
+
+		for value := range inputChannel {
+			select {
+			case <-done:
+				return
+			default:
+				elements = append(elements, value)
+			}
+		}
+		for index := len(elements) - 1; index >= 0; index-- {
+			select {
+			case <-done:
+				return
+			case outputChannel <- elements[index]:
+			}
+		}
+	}()
+	return outputChannel
+}
+
 func Merge(done <-chan interface{}, channels ...<-chan interface{}) <-chan interface{} {
 
 	outputChannel := make(chan interface{})

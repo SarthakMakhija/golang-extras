@@ -81,6 +81,32 @@ func TestFilter(t *testing.T) {
 	}
 }
 
+func TestReverse(t *testing.T) {
+	done := make(chan interface{})
+	defer close(done)
+
+	inputChannel := make(chan interface{})
+	go func() {
+		defer close(inputChannel)
+		inputChannel <- 1
+		inputChannel <- 2
+		inputChannel <- 3
+		inputChannel <- 4
+	}()
+
+	outputChannel := extra.Reverse(done, inputChannel)
+
+	var elements []interface{}
+	for mapped := range outputChannel {
+		elements = append(elements, mapped)
+	}
+
+	expected := []interface{}{4, 3, 2, 1}
+	if !reflect.DeepEqual(elements, expected) {
+		t.Fatalf("Expected %v from Reverse, received %v", expected, elements)
+	}
+}
+
 func TestTake(t *testing.T) {
 	done := make(chan interface{})
 	defer close(done)
