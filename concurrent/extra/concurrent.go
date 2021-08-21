@@ -5,15 +5,6 @@ import (
 	"gitlab.com/stone.code/assert"
 )
 
-/**
-All the functions have one problem, what if the inputChannel is closed,
-	`
-		for value := range inputChannel
-		will block, if the inputChannel is closed.
-	`
-Need to handle that
-*/
-
 func Repeat(
 	done <-chan interface{},
 	generatorFunction func() interface{},
