@@ -73,6 +73,32 @@ func Filter(
 	return outputChannel
 }
 
+func RunningReduce(
+	done <-chan interface{},
+	inputChannel <-chan interface{},
+	initialValue interface{},
+	aggregateFunction func(aggregate interface{}, value interface{}) interface{},
+) <-chan interface{} {
+
+	assertNonNilChannels(done, inputChannel)
+
+	outputChannel := make(chan interface{})
+	go func() {
+		aggregate := initialValue
+		defer close(outputChannel)
+		for value := range inputChannel {
+			select {
+			case <-done:
+				return
+			default:
+				aggregate = aggregateFunction(aggregate, value)
+				outputChannel <- aggregate
+			}
+		}
+	}()
+	return outputChannel
+}
+
 func Skip(
 	done <-chan interface{},
 	inputChannel <-chan interface{},

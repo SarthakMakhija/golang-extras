@@ -81,6 +81,35 @@ func TestFilter(t *testing.T) {
 	}
 }
 
+func TestRunningReduce(t *testing.T) {
+	done := make(chan interface{})
+	defer close(done)
+
+	inputChannel := make(chan interface{})
+	go func() {
+		defer close(inputChannel)
+		inputChannel <- 1
+		inputChannel <- 2
+		inputChannel <- 3
+		inputChannel <- 4
+		inputChannel <- 5
+	}()
+
+	outputChannel := extra.RunningReduce(done, inputChannel, 0, func(aggregate interface{}, value interface{}) interface{} {
+		return aggregate.(int) + value.(int)
+	})
+
+	var elements []interface{}
+	for element := range outputChannel {
+		elements = append(elements, element)
+	}
+
+	expected := []interface{}{1, 3, 6, 10, 15}
+	if !reflect.DeepEqual(elements, expected) {
+		t.Fatalf("Expected %v from RunningReduce, received %v", expected, elements)
+	}
+}
+
 func TestSkip(t *testing.T) {
 	done := make(chan interface{})
 	defer close(done)
@@ -99,8 +128,8 @@ func TestSkip(t *testing.T) {
 	})
 
 	var elements []interface{}
-	for mapped := range outputChannel {
-		elements = append(elements, mapped)
+	for element := range outputChannel {
+		elements = append(elements, element)
 	}
 
 	expected := []interface{}{1, 3}
@@ -125,8 +154,8 @@ func TestReverse(t *testing.T) {
 	outputChannel := extra.Reverse(done, inputChannel)
 
 	var elements []interface{}
-	for mapped := range outputChannel {
-		elements = append(elements, mapped)
+	for element := range outputChannel {
+		elements = append(elements, element)
 	}
 
 	expected := []interface{}{4, 3, 2, 1}
