@@ -1,5 +1,10 @@
 package extra
 
+import (
+	"fmt"
+	"gitlab.com/stone.code/assert"
+)
+
 /**
 All the functions have one problem, what if the inputChannel is closed,
 	`
@@ -13,6 +18,8 @@ func Repeat(
 	done <-chan interface{},
 	generatorFunction func() interface{},
 ) <-chan interface{} {
+
+	assertNonNilChannels(done)
 
 	outputChannel := make(chan interface{})
 	go func() {
@@ -34,6 +41,8 @@ func Map(
 	mapFunction func(interface{}) interface{},
 ) <-chan interface{} {
 
+	assertNonNilChannels(done, inputChannel)
+
 	outputChannel := make(chan interface{})
 	go func() {
 		defer close(outputChannel)
@@ -53,6 +62,8 @@ func Filter(
 	inputChannel <-chan interface{},
 	filterFunction func(interface{}) bool,
 ) <-chan interface{} {
+
+	assertNonNilChannels(done, inputChannel)
 
 	outputChannel := make(chan interface{})
 	go func() {
@@ -77,6 +88,8 @@ func Skip(
 	skipFunction func(interface{}) bool,
 ) <-chan interface{} {
 
+	assertNonNilChannels(done, inputChannel)
+
 	outputChannel := make(chan interface{})
 	go func() {
 		defer close(outputChannel)
@@ -100,6 +113,8 @@ func Take(
 	nElements int,
 ) <-chan interface{} {
 
+	assertNonNilChannels(done, inputChannel)
+
 	outputChannel := make(chan interface{})
 	go func() {
 		defer close(outputChannel)
@@ -119,6 +134,8 @@ func TakeWhile(
 	inputChannel <-chan interface{},
 	condition func(interface{}) bool,
 ) <-chan interface{} {
+
+	assertNonNilChannels(done, inputChannel)
 
 	outputChannel := make(chan interface{})
 	go func() {
@@ -145,6 +162,8 @@ func DropAll(
 	element int,
 ) <-chan interface{} {
 
+	assertNonNilChannels(done, inputChannel)
+
 	outputChannel := make(chan interface{})
 	go func() {
 		defer close(outputChannel)
@@ -166,6 +185,8 @@ func Reverse(
 	done <-chan interface{},
 	inputChannel <-chan interface{},
 ) <-chan interface{} {
+
+	assertNonNilChannels(done, inputChannel)
 
 	outputChannel := make(chan interface{})
 	go func() {
@@ -196,6 +217,9 @@ func Merge(
 	channels ...<-chan interface{},
 ) <-chan interface{} {
 
+	assertNonNilChannels(done)
+	assertNonNilChannels(channels...)
+
 	outputChannel := make(chan interface{})
 	go func() {
 		defer close(outputChannel)
@@ -219,6 +243,8 @@ func Tee(
 	done <-chan interface{},
 	inputChannel <-chan interface{},
 ) (<-chan interface{}, chan interface{}) {
+
+	assertNonNilChannels(done, inputChannel)
 
 	outputChannel1 := make(chan interface{})
 	outputChannel2 := make(chan interface{})
@@ -244,4 +270,10 @@ func Tee(
 		}
 	}()
 	return outputChannel1, outputChannel2
+}
+
+func assertNonNilChannels(channels ...<-chan interface{}) {
+	for _, ch := range channels {
+		assert.Assert(ch != nil, fmt.Sprintf("Channel %v must not be nil", ch))
+	}
 }
