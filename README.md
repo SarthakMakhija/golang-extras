@@ -23,3 +23,73 @@ Contains a set of small functions under concurrent/extra package -
   + launches a goroutine to merge input channels and writes the merged values to an output channel
 + Tee
   + launches a goroutine to read from an input channel and writes to 2 output channels
+
+
+# Usage
+
+**Repeat**
+
+```golang
+  
+done := make(chan interface{})
+defer close(done)
+
+outputChannel := extra.Repeat(done, func() interface{} {
+  return 1
+})
+
+var elements []interface{}
+for count := 1; count <= 3; count++ {
+  elements = append(elements, <-outputChannel)
+}
+```
+
+**Map**
+
+```golang
+  
+done := make(chan interface{})
+defer close(done)
+
+inputChannel := make(chan interface{})
+go func() {
+  defer close(inputChannel)
+  inputChannel <- 1
+  inputChannel <- 2
+  inputChannel <- 3
+}()
+
+outputChannel := extra.Map(done, inputChannel, func(value interface{}) interface{} {
+  return (value.(int)) * 2
+})
+
+var elements []interface{}
+for mapped := range outputChannel {
+  elements = append(elements, mapped)
+}
+```
+
+**Creating a pipeline using Repeat, Map and Take**
+
+```golang
+done := make(chan interface{})
+defer close(done)
+
+outputChannel := extra.Take(done,
+  extra.Map(done,
+    extra.Repeat(done,
+      func() interface{} {
+        return 2
+      },
+    ),
+    func(value interface{}) interface{} {
+      return (value.(int)) * 2
+    },
+  ), 4)
+
+var elements []interface{}
+for element := range outputChannel {
+  elements = append(elements, element)
+}
+```
+
