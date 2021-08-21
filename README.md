@@ -7,6 +7,8 @@ Contains a set of small functions under concurrent/extra package -
   + launches a goroutine to map values from an incoming channel and writes these mapped values to an output channel
 + Filter
   + launches a goroutine to filter values from an incoming channel and writes these filtered values to an output channel
++ RunningReduce
+  + launches a goroutine to perform reduction on the values from an incoming channel and writes these reduced values to an output channel
 + Skip
   + launches a goroutine to skip values from an incoming channel and writes all values other than skipped values to an output channel
 + Reverse
